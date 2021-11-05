@@ -1,25 +1,80 @@
-call plug#begin('~/.vim/plugged')
 
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-Plug 'scrooloose/nerdtree'
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+
+" $$\    $$\ $$\                     $$$$$$$\   $$$$$$\  
+" $$ |   $$ |\__|                    $$  __$$\ $$  __$$\ 
+" $$ |   $$ |$$\ $$$$$$\$$$$\        $$ |  $$ |$$ /  \__|
+" \$$\  $$  |$$ |$$  _$$  _$$\       $$$$$$$  |$$ |      
+"  \$$\$$  / $$ |$$ / $$ / $$ |      $$  __$$< $$ |      
+"   \$$$  /  $$ |$$ | $$ | $$ |      $$ |  $$ |$$ |  $$\ 
+"    \$  /   $$ |$$ | $$ | $$ |      $$ |  $$ |\$$$$$$  |
+"     \_/    \__|\__| \__| \__|      \__|  \__| \______/ 
+                                                       
+
+call plug#begin('~/.vim/plugged')
+" Color Scheme etc.
 Plug 'Ryanoasis/vim-devicons'
 Plug 'preservim/nerdcommenter'
 Plug 'itchyny/lightline.vim'
 Plug 'morhetz/gruvbox'
+Plug 'danilo-augusto/vim-afterglow'
 Plug 'pangloss/vim-javascript'
-Plug 'leafgarland/typescript-vim'
-Plug 'maxmellon/vim-jsx-pretty'
 Plug 'ap/vim-css-color'
+Plug 'HerringtonDarkholme/yats.vim'
+" NERDTree
+Plug 'scrooloose/nerdtree'
+Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+" CoC, Prettier, TS etc.
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'maxmellon/vim-jsx-pretty'
 Plug 'leafgarland/typescript-vim'
 Plug 'peitalin/vim-jsx-typescript'
-
+Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
+" VimWiki
+Plug 'vimwiki/vimwiki'
+Plug 'plasticboy/vim-markdown'
+" Snippets
+Plug 'SirVer/ultisnips'
+Plug 'mlaursen/vim-react-snippets'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+" Telescope
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
+" Git
+Plug 'tpope/vim-fugitive'
 call plug#end()
 
-" Colourscheme
+" --Colourscheme---
+" Available: gruvbox, afterglow
 colorscheme gruvbox
+
+" Lightline Config
+let g:lightline = {
+      \ 'colorscheme': 'wombat',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'FugitiveHead'
+      \ },
+      \ }
+
+"-- Generic Settings---
+" Auto-Reload File Changes
+set autoread
+
+" Keep cursor in center of screen
+set scrolloff=20
+
+" Setting to tabs instead of spaces for now
+set tabstop=2
+set shiftwidth=2
+set expandtab
+
+" New tabs go to right vertically, bottom horizontally
+set splitbelow
+set splitright
 
 " Transparency
 hi Normal guibg=NONE ctermbg=NONE
@@ -27,24 +82,67 @@ hi Normal guibg=NONE ctermbg=NONE
 " Show relative line numbers
 set relativenumber
 
-" Start nerdtree automatically 
-" autocmd vimenter * NERDTree
+" ---VimWiki & Markdown---
+set nocompatible
+syntax on
+let g:vimwiki_list = [{'path': '~/vimwiki/',
+                      \ 'syntax': 'markdown', 'ext': '.md'}]
 
-" Setting to tabs instead of spaces for now
-:set tabstop=4
-:set shiftwidth=4
-:set expandtab
+let g:vim_markdown_fenced_languages = ['bash=sh', 'javascript', 'js=javascript', 'json=javascript', 'typescript', 'ts=typescript', 'php', 'html', 'css', 'rust', 'python']
 
-"-- AUTOCOMPLETION --"
+" Vim-Snippets
+filetype plugin indent on
+let g:UltiSnipsExpandTrigger="<c-j>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+" Remap leader key
+let mapleader = ","
+
+" Exit terminal with escape
+tnoremap <Esc> <C-\><C-n>
+
+" Remap Copy to Clipboard
+" CTRL-X is Cut
+vnoremap <C-X> "+x
+" CTRL-C is Copy
+vnoremap <C-C> "+y
+" CTRL-P is Paste
+nnoremap <C-P> "+P
+
+" Ctrl-B to Previous File in Buffer
+nnoremap <C-B> :e#<CR>
+
+" Bind Ctrl-T to new tab
+nnoremap <C-t> :tabnew<Space><CR>
+inoremap <C-t> <Esc>:tabnew<Space><CR>
+
+"-- Autocomplete --"
 filetype plugin on
 set omnifunc=syntaxcomplete#Complete
 
-" Keybindings 
+"-- Telescope --"
+" Find files using Telescope command-line sugar
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
-" NERDTree
-map <C-o> :NERDTreeToggle<CR>
-" Fuzzy Finder
-map <F11> :FZF<CR>
+"-- NERDTree --"
+" CD into bookmark automatically
+let NERDTreeChDirMode=2
+" Show hidden files
+let NERDTreeShowHidden=1
+
+" Refresh NERDTree Automatically
+map <C-o> :call NERDTreeToggleAndRefresh()<CR>
+
+function NERDTreeToggleAndRefresh()
+  :NERDTreeToggle
+  if g:NERDTree.IsOpen()
+    :NERDTreeRefreshRoot
+  endif
+endfunction
 
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
@@ -57,17 +155,13 @@ inoremap <silent><expr> <TAB>
       \ coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-" COC bind to tab 
+"--CoC--"
+" COC bind to tab
 function! s:check_back_space() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
-" LaTex compile
-map <F12> :! pdflatex %<CR><CR>
-" map S :! evince $(echo *.pdf) & disown<CR><CR>
-
-" CoC "
 " TextEdit might fail if hidden is not set.
 set hidden
 
@@ -127,6 +221,8 @@ nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gD :call CocAction('jumpDefinition', 'tab drop')<CR>
+nmap <silent> gT :call CocAction('jumpDefinition', 'vsplit')<CR> 
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
@@ -217,5 +313,3 @@ nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>n
-
-
