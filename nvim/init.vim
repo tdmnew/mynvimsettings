@@ -17,6 +17,8 @@ Plug 'Ryanoasis/vim-devicons'
 Plug 'preservim/nerdcommenter'
 Plug 'itchyny/lightline.vim'
 Plug 'pangloss/vim-javascript'
+" Start Up
+Plug 'mhinz/vim-startify'
 " Colour Scheme
 Plug 'ap/vim-css-color'
 Plug 'HerringtonDarkholme/yats.vim'
@@ -48,39 +50,10 @@ Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 Plug 'tpope/vim-fugitive'
 call plug#end()
 
-"-- Theme --"
-augroup MyColors
-    autocmd!
-    autocmd ColorScheme * highlight Visual term=reverse
-                      \ | highlight Pmenu cterm=none ctermbg=darkGrey ctermfg=white
-                      \ | highlight PmenuSel cterm=none ctermbg=darkGrey ctermfg=black
-                      \ | highlight Search term=reverse ctermfg=blue ctermbg=black
-                      \ | highlight Comment ctermfg=Grey
-augroup END
-
-" gruvbox, afterglow, molokai, jellybeans
-colorscheme gruvbox
-
-"-- Lightline --"
-let g:lightline = {
-      \ 'colorscheme': 'solarized',
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
-      \ },
-      \ 'component_function': {
-      \   'gitbranch': 'FugitiveHead'
-      \ },
-      \ }
-
 "--- Load Files ---"
 source ~/.config/nvim/general.vim
+source ~/.config/nvim/theme.vim
+source ~/.config/nvim/start-screen.vim
 source ~/.config/nvim/coc.vim
 source ~/.config/nvim/nerdtree.vim
-
-"-- Telescope --"
-" Find files using Telescope command-line sugar
-nnoremap <leader>ff <cmd>Telescope find_files<cr>
-nnoremap <leader>fg <cmd>Telescope live_grep<cr>
-nnoremap <leader>fb <cmd>Telescope buffers<cr>
-nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+source ~/.config/nvim/telescope.vim
